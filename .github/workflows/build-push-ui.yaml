@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
     paths:
       - "applications/ui/**"
-      # - ".github/workflows/build-push-ui.yaml"
+      - ".github/workflows/build-push-ui.yaml"
 
 permissions:
   id-token: write
