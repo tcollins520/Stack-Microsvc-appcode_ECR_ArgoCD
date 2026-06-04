@@ -1,0 +1,16 @@
+{{- if .Values.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+
+metadata:
+  name: catalog-pdb
+
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: catalog
+      app.kubernetes.io/instance: catalog
+      app.kubernetes.io/component: service
+{{- end }}

@@ -1,0 +1,16 @@
+{{- if .Values.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+
+metadata:
+  name: checkout-pdb
+
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: checkout
+      app.kubernetes.io/instance: checkout
+      app.kubernetes.io/component: service
+{{- end }}
