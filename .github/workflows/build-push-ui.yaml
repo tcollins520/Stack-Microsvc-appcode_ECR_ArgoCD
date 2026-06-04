@@ -1,57 +1,57 @@
 name: Build and Push UI Service to ECR
 
 on:
-push:
-branches: [ "main" ]
-paths:
-- "applications/ui/**"
-# - ".github/workflows/build-push-ui.yaml"
+  push:
+    branches: [ "main" ]
+    paths:
+      - "applications/ui/**"
+      # - ".github/workflows/build-push-ui.yaml"
 
 permissions:
-id-token: write
+  id-token: write
 
 env:
-AWS_REGION: us-east-1
-ECR_REPOSITORY: retail-store/ui
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: retail-store/ui
 
 jobs:
-build-and-push-ui:
-runs-on: ubuntu-latest
+  build-and-push-ui:
+    runs-on: ubuntu-latest
 
-steps:
-  - name: Checkout code
-    uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  - name: Configure AWS credentials via OIDC
-    uses: aws-actions/configure-aws-credentials@v4
-    with:
-      role-to-assume: arn:aws:iam::788143860357:role/github-actions-oidc-role-ui3
-      aws-region: ${{ env.AWS_REGION }}
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::788143860357:role/github-actions-oidc-role-ui3
+          aws-region: ${{ env.AWS_REGION }}
 
-  - name: Login to Amazon ECR
-    id: login-ecr
-    uses: aws-actions/amazon-ecr-login@v2
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
-  - name: Define image tags
-    run: |
-      SHA_TAG=sha-${GITHUB_SHA::7}
-      IMAGE_BASE="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}"
+      - name: Define image tags
+        run: |
+          SHA_TAG=sha-${GITHUB_SHA::7}
+          IMAGE_BASE="${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}"
 
-      echo "IMAGE_BASE=$IMAGE_BASE" >> $GITHUB_ENV
-      echo "SHA_TAG=$SHA_TAG" >> $GITHUB_ENV
+          echo "IMAGE_BASE=$IMAGE_BASE" >> $GITHUB_ENV
+          echo "SHA_TAG=$SHA_TAG" >> $GITHUB_ENV
 
-  - name: Build and push Docker images
-    run: |
-      for tag in latest $SHA_TAG; do
-        IMAGE_URI="$IMAGE_BASE:$tag"
+      - name: Build and push Docker images
+        run: |
+          for tag in latest $SHA_TAG; do
+            IMAGE_URI="$IMAGE_BASE:$tag"
 
-        echo "Building and pushing $IMAGE_URI"
+            echo "Building and pushing $IMAGE_URI"
 
-        docker build -t $IMAGE_URI applications/ui
-        docker push $IMAGE_URI
-      done
+            docker build -t $IMAGE_URI applications/ui
+            docker push $IMAGE_URI
+          done
 
-  - name: CI Complete
-    run: |
-      echo "Image push complete"
-      echo "Image: $IMAGE_BASE:$SHA_TAG"
+      - name: CI Complete
+        run: |
+          echo "Image push complete"
+          echo "Image: $IMAGE_BASE:$SHA_TAG"
