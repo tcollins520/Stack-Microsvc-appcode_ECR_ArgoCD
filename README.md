@@ -1,175 +1,236 @@
-What This Project Will Produce
-A Complete Production-Style E-Commerce Platform
+Overview
 
-that deploys a retail store application made up of:
+This repository contains the application source code for a cloud-native microservices platform deployed on Amazon EKS using GitOps principles.
 
-* Catalog Service
-* Cart Service
-* Checkout Service
-* Orders Service
-* UI Frontend
+The platform consists of multiple Java Spring Boot microservices packaged as Docker containers and deployed through a fully automated CI/CD pipeline using GitHub Actions, Amazon ECR, ArgoCD, Helm, and Argo Rollouts.
 
-Built using multiple technologies:
+The application demonstrates modern platform engineering practices including:
 
-* Go
-* Java Spring Boot
-* Node.js
+Containerized microservices
+GitOps deployments
+Progressive delivery
+Canary deployments
+Blue/Green deployments
+Horizontal Pod Autoscaling
+Observability with OpenTelemetry
+Amazon EKS workloads running on Karpenter-provisioned nodes
+Architecture
+``Developer Commit
+        │
+        ▼
+GitHub Actions
+        │
+        ▼
+Docker Build
+        │
+        ▼
+Amazon ECR
+        │
+        ▼
+GitOps Repository Update
+        │
+        ▼
+ArgoCD Sync
+        │
+        ▼
+Amazon EKS
+        │
+        ▼
+Argo Rollouts
+        │
+ ┌──────┴──────┐
+ │             │
+Canary     Blue/Green
+Deployments Deployments
+``
+Microservices
 
-This mirrors how real enterprise companies structure microservices applications.
+The application consists of the following services:
 
-☁️ Full AWS Cloud Infrastructure
+Service	Description
+UI	Frontend retail storefront
+Catalog	Product catalog service
+Cart	Shopping cart service
+Checkout	Checkout workflow service
+Orders	Order management service
 
-Using Terraform, the project provisions:
+# CI/CD Pipeline
 
-* AWS VPC
-* Public Subnets
-* Route Tables
-* Internet Gateway
-* AWS EKS Cluster
-* Managed Node Groups
-* IAM Roles
-* OIDC / IRSA
-* Security Groups
-* Storage Infrastructure
+GitHub Actions automates the application delivery workflow:
 
-All fully automated as Infrastructure as Code.
+Pipeline Stages
+1. Build Java application
+2. Execute Maven packaging
+3. Build Docker image
+4. Push image to Amazon ECR
+5. Update Helm values with image tag
+6. Commit image update to GitOps repository
+7. ArgoCD detects change
+8. Deploy to Amazon EKS
 
-🐳 Containerized Microservices Platform that:
+Example image tags:
 
-* Build Docker images
-* Use multi-stage Docker builds
-* Optimize image sizes
-* Implement multi-platform builds (AMD64 + ARM64)
-*  Use Docker Compose
-*  Push images to Amazon ECR
+sha-fa7dd2d
+sha-d01d139
+Progressive Delivery
+Canary Deployments
 
+Implemented using Argo Rollouts.
 
+Traffic is gradually shifted to the new version:
 
-☸️ Kubernetes Enterprise Deployment that deploys
+25%
+50%
+75%
+100%
 
-* 10+ containers/services
-* Stateful applications
-* Microservices communication
-* Kubernetes Deployments
-* StatefulSets
-* Network Services
-* ConfigMaps
-* Secrets
-* Namespaces
-* Ingress
-* StorageClasses
-* PVCs
+Benefits:
 
-🔐 Advanced AWS Security & Identity
+* Reduced deployment risk
+* Early issue detection
+* Controlled traffic exposure
+  
+# Blue/Green Deployments
 
-The project implements:
+Implemented using:
 
-* IAM Roles for Service Accounts (IRSA)
-* EKS Pod Identity
-* AWS Secrets Manager
-* Secrets Store CSI Driver
-* Secure secret injection into Kubernetes pods
+ui-active
+ui-preview
 
-💾 Persistent Storage & Databases
+services.
+``
+Deployment flow:
 
-* Self-hosted databases on EKS
-* MySQL
-* PostgreSQL
-* Redis
-* RabbitMQ
+Current Version (Blue)
+        │
+        ▼
+Deploy Green Environment
+        │
+        ▼
+Validate Preview
+        │
+        ▼
+Manual Promotion
+        │
+        ▼
+Traffic Switch
+        │
+        ▼
+Scale Down Previous Version
+``
 
-AND later migrate to:
+This enables zero-downtime application releases.
 
-* AWS managed services
-* RDS MySQL
-* DynamoDB
-* ElastiCache Redis
-* Amazon SQS
+# Containerization
 
-🌐 Production Networking & HTTPS
+Each microservice is packaged as a Docker image using multi-stage builds.
 
-Implement:
+Benefits:
 
-* AWS Load Balancer Controller
-* Kubernetes Ingress
-* Route53
-* AWS ACM Certificates
-* ExternalDNS
-* HTTPS/TLS
-* Automated DNS creation
+* Smaller runtime images
+* Reduced attack surface
+* Faster deployments
+* Separation of build and runtime dependencies
 
-📦 Helm Enterprise Packaging
+Example:
 
-* Create Helm charts
-* Use values.yaml
-* Template Kubernetes manifests
-* Package Helm charts
-* Publish Helm charts
-* Deploy entire applications using Helm
+FROM amazonlinux:2023 AS build-env
 
-This becomes real Helm engineering experience.
+# Build application
 
-🔄 Full CI/CD + GitOps Platform building
+FROM amazonlinux:2023
 
-* CI Pipeline
-Using:
+# Runtime image only
 
-* GitHub Actions
-* Docker builds
-* ECR image pushes
-* Helm chart updates
-* CD Pipeline
+# Scaling
 
-Using:
+Horizontal Pod Autoscaler (HPA) automatically scales workloads based on:
 
-* ArgoCD
-* GitOps workflows
-* Automated Kubernetes sync
+* CPU utilization
+* Memory utilization
 
-📈 Observability & Monitoring Stack
+Example configuration:
 
-Implement:
+Min Replicas: 2
+Max Replicas: 12
+CPU Target: 70%
+Memory Target: 80%
 
+# Observability
+
+The platform supports:
+
+Metrics
 * OpenTelemetry
-* AWS X-Ray
-* CloudWatch Logs
-* Amazon Managed Prometheus
-* Amazon Managed Grafana
-* Metrics collection
-* Traces
-* Logging pipelines
+* Prometheus
+* Grafana
+* Tracing
+* AWS Distro for OpenTelemetry (ADOT)
+* Distributed request tracing
 
-⚡ Auto Scaling & Cost Optimization
+Example dashboards include:
 
-Implement:
-
+* Cluster utilization
+* Pod metrics
+* Node metrics
+* Network throughput
+* Resource consumption
+* 
+# Running Locally
+# Build Application
+./mvnw clean package
+# Build Docker Image
+docker build -t retail-store-ui:latest .
+# Run Container
+docker run -p 8080:8080 retail-store-ui:latest
+# Screenshots
+Retail Store UI
+* V1 Deployment
+* V2 Deployment
+* V3 Deployment
+# ArgoCD
+* Application Topology
+* GitOps Synchronization
+# Argo Rollouts
+* Canary Deployments
+* Blue/Green Deployments
+# Observability
+* Grafana Dashboards
+* OpenTelemetry Metrics
+* OpenTelemetry Traces
+# Technology Stack
+Application
+* Java 21
+* Spring Boot
+* Maven
+# Containers
+* Docker
+* Amazon ECR
+# Kubernetes
+* Amazon EKS
+* Helm
+* ArgoCD
+* Argo Rollouts
 * Karpenter
-
-* For intelligent node autoscaling
-
-* Horizontal Pod Autoscaler (HPA)
-
-* For application autoscaling
-
-Including:
-
-* Spot instances
-* Interruption handling
-* Pod disruption budgets
-
-🧠 What This Project Really Produces
-
-By the end, you’ll have:
-
-✅ Production-grade AWS DevOps platform
-✅ Enterprise Kubernetes experience
-✅ GitOps expertise
-✅ CI/CD engineering skills
-✅ Terraform mastery
-✅ Helm expertise
-✅ Cloud-native architecture knowledge
-✅ Observability stack implementation
-✅ Kubernetes troubleshooting experience
-✅ Platform engineering portfolio project
-# Stack-Microsvc-EKS-Helm-appcode_GitOps
-#
+* HPA
+# Observability
+* OpenTelemetry
+* ADOT
+* Prometheus
+* Grafana
+# CI/CD
+* GitHub Actions
+* GitOps
+# Key Skills Demonstrated
+* Cloud-Native Architecture
+* Microservices
+* Containerization
+* Kubernetes Operations
+* GitOps
+* CI/CD Automation
+* Progressive Delivery
+* Canary Releases
+* Blue/Green Deployments
+* Platform Engineering
+* Observability
+* Infrastructure Automation
