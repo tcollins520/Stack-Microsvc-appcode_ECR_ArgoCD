@@ -9,6 +9,7 @@ The application demonstrates modern platform engineering practices including:
 Containerized microservices GitOps deployments Progressive delivery Canary deployments Blue/Green deployments Horizontal Pod Autoscaling Observability with OpenTelemetry Amazon EKS workloads running on Karpenter-provisioned nodes
 
 Architecture
+```
 Developer Commit
         │
         ▼
@@ -36,7 +37,7 @@ Argo Rollouts
  │             │
 Canary     Blue/Green
 Deployments Deployments
-``
+```
 Microservices
 
 The application consists of the following services:
@@ -92,7 +93,7 @@ ui-active
 ui-preview
 
 services.
-``
+```
 Deployment flow:
 
 Current Version (Blue)
@@ -111,7 +112,7 @@ Traffic Switch
         │
         ▼
 Scale Down Previous Version
-``
+```
 
 This enables zero-downtime application releases.
 
