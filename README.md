@@ -175,7 +175,7 @@ Example dashboards include:
 # Build Application
 ./mvnw clean package
 # Build Docker Image
-docker build -t retail-store-ui:latest .
+docker build -t tcollins520/retail-store-ui:latest .
 # Run Container
 docker run -p 8080:8080 retail-store-ui:latest
 # Screenshots
